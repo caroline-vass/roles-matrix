@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pay Equity Audit — Festina Group Tech</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;font-size:14px;background:#fff;color:#1a1a1a;padding:1.5rem}
+.tab-bar{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:1px solid #e5e5e5;flex-wrap:wrap}
+.tab-btn{padding:7px 14px;font-size:13px;border:none;background:none;color:#666;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
+.tab-btn.active{color:#1a1a1a;font-weight:500;border-bottom-color:#1a1a1a}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.card{border:1px solid #e5e5e5;border-radius:8px;padding:14px 16px;margin-bottom:10px;background:#fff}
+.card-title{font-size:13px;font-weight:500;margin-bottom:6px}
+.card-body{font-size:12px;color:#555;line-height:1.6}
+.stat-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.stat-card{background:#f9f9f9;border-radius:8px;padding:12px 14px;text-align:center}
+.stat-label{font-size:11px;color:#888;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:6px 8px;font-size:11px;font-weight:500;color:#888;border-bottom:1px solid #e5e5e5;white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap}
+.tag-red{background:#fce8e6;color:#c5221f;border-color:#f5b7b4}
+.tag-green{background:#e6f4ea;color:#1a7f37;border-color:#b3dfc0}
+.tag-amber{background:#fff8e6;color:#92660a;border-color:#f5d87a}
+.tag-gray{background:#f5f5f5;color:#666;border-color:#e0e0e0}
+.tag-blue{background:#e8f0fe;color:#1a56db;border-color:#c3d3fb}
+.bar-wrap{display:flex;align-items:center;gap:6px}
+.bar-bg{width:60px;height:6px;background:#e5e5e5;border-radius:3px;overflow:hidden;flex-shrink:0}
+.bar-fill{height:100%;border-radius:3px}
+button.dl{padding:7px 16px;font-size:13px;cursor:pointer;border:none;border-radius:6px;color:#fff;font-family:inherit}
+select{font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;background:#fff}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.filter-pill{padding:4px 10px;font-size:12px;border-radius:20px;cursor:pointer;font-family:inherit;border:1px solid #e0e0e0;background:#f5f5f5;color:#444}
+.filter-pill.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.export-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="tab-bar" id="tabBar"></div>
+<div id="tab-overview" class="tab-pane active"></div>
+<div id="tab-employees" class="tab-pane"></div>
+<div id="tab-priority" class="tab-pane"></div>
+<div id="tab-gender" class="tab-pane"></div>
+<div id="tab-gender-input" class="tab-pane"></div>
+<div id="tab-export" class="tab-pane"></div>
+
+<script>
+const EMPLOYEES=[
+  {id:"EMP-001",name:"Ludwig",team:"Cloud",family:"Software Engineering",role:"Cloud Developer",level:"Mid",pct:100,salary:55500,gender:"m"},
+  {id:"EMP-002",name:"Hannes Birgersson",team:"Cloud",family:"Software Engineering",role:"Cloud Developer",level:"Senior",pct:100,salary:65600,gender:"m"},
+  {id:"EMP-003",name:"Milos Djelic",team:"Data",family:"Data & AI",role:"Data Scientist",level:"Mid",pct:100,salary:55000,gender:"m"},
+  {id:"EMP-004",name:"Anders Tingsek",team:"QA",family:"Quality Assurance",role:"QA Engineer",level:"Senior",pct:100,salary:51850,gender:"m"},
+  {id:"EMP-005",name:"Catrine Bergstromner",team:"QA",family:"Quality Assurance",role:"QA Engineer",level:"Senior",pct:100,salary:53900,gender:"f"},
+  {id:"EMP-006",name:"Csaba Toth",team:"QA",family:"Quality Assurance",role:"QA Engineer",level:"Senior",pct:100,salary:50700,gender:"m"},
+  {id:"EMP-007",name:"Jens Forander",team:"QA",family:"Quality Assurance",role:"QA Engineer",level:"Junior",pct:100,salary:32000,gender:"m"},
+  {id:"EMP-008",name:"Jenny Nordblad",team:"Customer Support",family:"Customer Support",role:"Customer Support Specialist",level:"Junior",pct:100,salary:33100,gender:"f"},
+  {id:"EMP-009",name:"Patrik Nilsson",team:"Mobile",family:"Software Engineering",role:"Mobile Developer",level:"Senior",pct:100,salary:60600,gender:"m"},
+  {id:"EMP-010",name:"Linus Zetterlund",team:"Mobile",family:"Software Engineering",role:"Mobile Developer",level:"Senior",pct:100,salary:55000,gender:"m"},
+  {id:"EMP-011",name:"Dan Tugendraich",team:"Mobile",family:"Software Engineering",role:"Mobile Developer",level:"Senior",pct:100,salary:56700,gender:"m"},
+  {id:"EMP-012",name:"Daniel Block",team:"Mobile",family:"Software Engineering",role:"Mobile Developer",level:"Senior",pct:100,salary:59300,gender:"m"},
+  {id:"EMP-013",name:"Marijn Schilling",team:"Mobile",family:"Software Engineering",role:"Mobile Developer",level:"Mid",pct:80,salary:52000,gender:"m"},
+  {id:"EMP-014",name:"Niklas Wintren",team:"Mobile",family:"Software Engineering",role:"Mobile Developer",level:"Senior",pct:100,salary:57000,gender:"m"},
+  {id:"EMP-015",name:"Filip Ivansson",team:"Design",family:"Design & UX",role:"UX Designer",level:"Senior",pct:100,salary:60650,gender:"m"},
+  {id:"EMP-016",name:"Dari Escobar",team:"Design",family:"Design & UX",role:"UX Designer",level:"Senior",pct:100,salary:56500,gender:"m"},
+  {id:"EMP-017",name:"Victoria Larsson",team:"Design",family:"Design & UX",role:"UX Designer",level:"Junior",pct:100,salary:39500,gender:"f"},
+  {id:"EMP-018",name:"Louise Hauzenberger",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Senior",pct:100,salary:54400,gender:"f"},
+  {id:"EMP-019",name:"Bjorn Green",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Mid",pct:100,salary:50700,gender:"m"},
+  {id:"EMP-020",name:"Peter Andersson",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Senior",pct:100,salary:68500,gender:"m"},
+  {id:"EMP-021",name:"Jack Bennhagen",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Mid",pct:100,salary:47700,gender:"m"},
+  {id:"EMP-022",name:"Stefan Milanovic",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Mid",pct:100,salary:47700,gender:"m"},
+  {id:"EMP-023",name:"Bastian Kalthoff",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Mid",pct:100,salary:51500,gender:"m"},
+  {id:"EMP-024",name:"Bjorn Mellstrom",team:"Embedded",family:"Embedded Engineering",role:"Embedded Engineer",level:"Senior",pct:100,salary:69000,gender:"m"},
+  {id:"EMP-025",name:"Magnus Ottosson",team:"Electronics",family:"Hardware / Electronics",role:"Electronics Engineer",level:"Senior",pct:100,salary:63900,gender:"m"},
+  {id:"EMP-026",name:"Patrik Augustsson",team:"Electronics",family:"Hardware / Electronics",role:"Electronics Engineer",level:"Senior",pct:100,salary:48000,gender:"m"},
+  {id:"EMP-027",name:"Robert Johansson",team:"Electronics",family:"Hardware / Electronics",role:"Electronics Engineer",level:"Senior",pct:80,salary:60150,gender:"m"},
+  {id:"EMP-028",name:"Anna Nihlen",team:"Mechanical",family:"Hardware / Electronics",role:"Mechanical Engineer",level:"Senior",pct:100,salary:57200,gender:"f"},
+  {id:"EMP-029",name:"Caroline Vass",team:"People",family:"People & HR",role:"People & Culture Manager",level:"Senior",pct:100,salary:48200,gender:"f"},
+  {id:"EMP-030",name:"Anabela Veloso",team:"Web Development",family:"Design & UX",role:"Web Designer",level:"Mid",pct:100,salary:42000,gender:"f"},
+  {id:"EMP-031",name:"Malena Brinkheden",team:"Web Development",family:"Software Engineering",role:"Frontend Developer",level:"Mid",pct:100,salary:50000,gender:"f"},
+  {id:"EMP-032",name:"Billy Ardela",team:"Web Development",family:"Software Engineering",role:"Fullstack Developer",level:"Senior",pct:100,salary:56000,gender:"m"},
+  {id:"EMP-033",name:"Djina Stevkovska",team:"Web Development",family:"Software Engineering",role:"Fullstack Developer",level:"Mid",pct:100,salary:49000,gender:"f"},
+  {id:"EMP-034",name:"Dimitar Pashkovski",team:"Web Development",family:"Software Engineering",role:"Frontend Developer",level:"Senior",pct:100,salary:56000,gender:"m"},
+  {id:"EMP-035",name:"Kristoffer Eriksson",team:"Web Development",family:"Software Engineering",role:"Backend Developer",level:"Mid",pct:100,salary:52500,gender:"m"},
+  {id:"EMP-036",name:"Lovisa Stefors",team:"Digital Marketing",family:"Marketing & Growth",role:"SEM Specialist",level:"Mid",pct:100,salary:42000,gender:"f"},
+  {id:"EMP-037",name:"Regina Merks",team:"Digital Marketing",family:"Marketing & Growth",role:"SEM Specialist",level:"Mid",pct:100,salary:43000,gender:"f"},
+  {id:"EMP-038",name:"Melissa Pekel",team:"Digital Marketing",family:"Marketing & Growth",role:"Performance Marketing Specialist",level:"Senior",pct:100,salary:48000,gender:"f"},
+  {id:"EMP-039",name:"Josefine Linde",team:"Digital Marketing",family:"Marketing & Growth",role:"Organic Growth Specialist",level:"Senior",pct:100,salary:46000,gender:"f"},
+  {id:"EMP-040",name:"Noemi Gobel",team:"Digital Marketing",family:"Marketing & Growth",role:"Content Strategist",level:"Mid",pct:100,salary:43000,gender:"f"},
+  {id:"EMP-041",name:"Mariola Enrique",team:"Digital Marketing",family:"Marketing & Growth",role:"Web Editor",level:"Junior",pct:100,salary:34000,gender:"f"},
+  {id:"EMP-042",name:"Zofi Holgersson",team:"Agile",family:"Product & Agile",role:"Agile Coach",level:"Senior",pct:100,salary:null,gender:"f"},
+  {id:"EMP-043",name:"Emil Olofsson",team:"Product",family:"Product & Agile",role:"Product Owner",level:"Senior",pct:100,salary:null,gender:"m"},
+  {id:"EMP-044",name:"Andreas Hallonsten",team:"Leadership",family:"Software Engineering",role:"Engineering Manager",level:"Senior",pct:100,salary:null,gender:"m"},
+  {id:"EMP-045",name:"Torben Weber",team:"Digital Marketing",family:"Marketing & Growth",role:"Marketing Manager",level:"Junior",pct:100,salary:null,gender:"m"},
+  {id:"EMP-080",name:"Geoffrey McArdle",team:"Design",family:"Design & UX",role:"Design Manager",level:"Senior",pct:100,salary:null,gender:"m"},
+  {id:"EMP-081",name:"William Elfversson",team:"Web Development",family:"Software Engineering",role:"Web Development Manager",level:"Senior",pct:100,salary:null,gender:"m"},
+];
+
+const BANDS={
+  "Cloud Developer|Junior":{min:42000,mid:46000,max:50000},
+  "Cloud Developer|Mid":{min:49000,mid:54500,max:60000},
+  "Cloud Developer|Senior":{min:59000,mid:65500,max:72000},
+  "Backend Developer|Junior":{min:41000,mid:45500,max:50000},
+  "Backend Developer|Mid":{min:49000,mid:54500,max:60000},
+  "Backend Developer|Senior":{min:59000,mid:65500,max:72000},
+  "Frontend Developer|Junior":{min:39000,mid:42500,max:46000},
+  "Frontend Developer|Mid":{min:45000,mid:50500,max:56000},
+  "Frontend Developer|Senior":{min:55000,mid:61500,max:68000},
+  "Fullstack Developer|Junior":{min:41000,mid:44500,max:48000},
+  "Fullstack Developer|Mid":{min:47000,mid:52500,max:58000},
+  "Fullstack Developer|Senior":{min:57000,mid:63500,max:70000},
+  "Mobile Developer|Junior":{min:41000,mid:44500,max:48000},
+  "Mobile Developer|Mid":{min:47000,mid:52500,max:58000},
+  "Mobile Developer|Senior":{min:57000,mid:62500,max:68000},
+  "Data Scientist|Junior":{min:43000,mid:46500,max:50000},
+  "Data Scientist|Mid":{min:49000,mid:55500,max:62000},
+  "Data Scientist|Senior":{min:61000,mid:68000,max:75000},
+  "QA Engineer|Junior":{min:37000,mid:39500,max:42000},
+  "QA Engineer|Mid":{min:41000,mid:44500,max:48000},
+  "QA Engineer|Senior":{min:47000,mid:51000,max:55000},
+  "UX Designer|Junior":{min:37000,mid:39500,max:42000},
+  "UX Designer|Mid":{min:41000,mid:45500,max:50000},
+  "UX Designer|Senior":{min:49000,mid:54500,max:60000},
+  "Web Designer|Junior":{min:37000,mid:39500,max:42000},
+  "Web Designer|Mid":{min:41000,mid:45500,max:50000},
+  "Web Designer|Senior":{min:49000,mid:54500,max:60000},
+  "Embedded Engineer|Junior":{min:41000,mid:44500,max:48000},
+  "Embedded Engineer|Mid":{min:47000,mid:52500,max:58000},
+  "Embedded Engineer|Senior":{min:57000,mid:63500,max:70000},
+  "Electronics Engineer|Junior":{min:39000,mid:42500,max:46000},
+  "Electronics Engineer|Mid":{min:45000,mid:50500,max:56000},
+  "Electronics Engineer|Senior":{min:55000,mid:61500,max:68000},
+  "Mechanical Engineer|Junior":{min:39000,mid:42500,max:46000},
+  "Mechanical Engineer|Mid":{min:45000,mid:50500,max:56000},
+  "Mechanical Engineer|Senior":{min:55000,mid:61500,max:68000},
+  "Product Owner|Junior":{min:41000,mid:44500,max:48000},
+  "Product Owner|Mid":{min:47000,mid:51500,max:56000},
+  "Product Owner|Senior":{min:55000,mid:60500,max:66000},
+  "Agile Coach|Junior":{min:44000,mid:49500,max:55000},
+  "Agile Coach|Mid":{min:51000,mid:56500,max:62000},
+  "Agile Coach|Senior":{min:61000,mid:66500,max:72000},
+  "Customer Support Specialist|Junior":{min:31000,mid:33500,max:36000},
+  "Customer Support Specialist|Mid":{min:35000,mid:37500,max:40000},
+  "Customer Support Specialist|Senior":{min:39000,mid:42000,max:45000},
+  "SEM Specialist|Junior":{min:35000,mid:37500,max:40000},
+  "SEM Specialist|Mid":{min:39000,mid:42500,max:46000},
+  "SEM Specialist|Senior":{min:45000,mid:49500,max:54000},
+  "Performance Marketing Specialist|Junior":{min:37000,mid:41500,max:46000},
+  "Performance Marketing Specialist|Mid":{min:45000,mid:49500,max:54000},
+  "Performance Marketing Specialist|Senior":{min:53000,mid:57500,max:62000},
+  "Organic Growth Specialist|Junior":{min:37000,mid:40500,max:44000},
+  "Organic Growth Specialist|Mid":{min:43000,mid:46500,max:50000},
+  "Organic Growth Specialist|Senior":{min:49000,mid:53500,max:58000},
+  "Content Strategist|Junior":{min:35000,mid:37500,max:40000},
+  "Content Strategist|Mid":{min:39000,mid:42500,max:46000},
+  "Content Strategist|Senior":{min:45000,mid:49500,max:54000},
+  "Web Editor|Junior":{min:31000,mid:33500,max:36000},
+  "Web Editor|Mid":{min:35000,mid:37500,max:40000},
+  "Web Editor|Senior":{min:39000,mid:41500,max:45000},
+  "People & Operations|Junior":{min:39000,mid:42000,max:45000},
+  "People & Operations|Mid":{min:44000,mid:48000,max:52000},
+  "People & Operations|Senior":{min:51000,mid:56500,max:62000},
+  "People & Culture Manager|Junior":{min:39000,mid:42000,max:45000},
+  "People & Culture Manager|Mid":{min:44000,mid:48000,max:52000},
+  "People & Culture Manager|Senior":{min:51000,mid:56500,max:62000},
+  "Marketing Manager|Junior":{min:48000,mid:53000,max:58000},
+  "Marketing Manager|Mid":{min:55000,mid:60000,max:66000},
+  "Marketing Manager|Senior":{min:63000,mid:69000,max:75000},
+  "Design Manager|Junior":{min:47000,mid:52000,max:57000},
+  "Design Manager|Mid":{min:53000,mid:59000,max:65000},
+  "Design Manager|Senior":{min:58000,mid:63000,max:68000},
+  "Web Development Manager|Junior":{min:66000,mid:73000,max:80000},
+  "Web Development Manager|Mid":{min:74000,mid:82000,max:90000},
+  "Web Development Manager|Senior":{min:70000,mid:78000,max:86000},
+  "Engineering Manager|Junior":{min:66000,mid:73000,max:80000},
+  "Engineering Manager|Mid":{min:74000,mid:82000,max:90000},
+  "Engineering Manager|Senior":{min:70000,mid:78000,max:86000},
+};
+
+let genders = {};
+EMPLOYEES.forEach(e => { genders[e.id] = e.gender || ""; });
+let filterStatus = "all";
+let activeTab = "overview";
+
+function getBand(role,level){ return BANDS[role+"|"+level]||null; }
+function getStatus(sal,band){ if(sal===null)return"Missing salary"; if(!band)return"No band set"; if(sal<band.min)return"Below band"; if(sal>band.max)return"Above band"; return"Within band"; }
+function getGap(sal,band){ if(!band||sal===null||sal>=band.min)return 0; return band.min-sal; }
+function posPct(sal,band){ if(!band||sal===null)return null; return Math.round(((sal-band.min)/(band.max-band.min))*100); }
+function avg(arr){ return arr.length?Math.round(arr.reduce((a,b)=>a+b,0)/arr.length):null; }
+
+function enrich(e){
+  const band=getBand(e.role,e.level);
+  const sal=e.salary;
+  const status=getStatus(sal,band);
+  const gap=getGap(sal,band);
+  return{...e,band,status,gap,annualGap:gap*12,pos:posPct(sal,band),gender:genders[e.id]||""};
+}
+
+function tagHTML(status){
+  const map={"Below band":"tag-red","Within band":"tag-green","Above band":"tag-amber","Missing salary":"tag-gray","No band set":"tag-gray"};
+  return`<span class="tag ${map[status]||"tag-gray"}">${status}</span>`;
+}
+
+function barHTML(pos){
+  if(pos===null)return"—";
+  const w=Math.max(0,Math.min(100,pos));
+  const c=pos<0?"#c5221f":pos>100?"#92660a":"#1a7f37";
+  return`<div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${w}%;background:${c}"></div></div><span style="font-size:11px;color:#666">${pos}%</span></div>`;
+}
+
+function showTab(id){
+  activeTab=id;
+  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+id).classList.add("active");
+  document.querySelector(`[data-tab="${id}"]`).classList.add("active");
+  render();
+}
+
+function buildTabs(){
+  const tabs=[["overview","Overview"],["employees","All employees"],["priority","Priority list"],["gender","Gender gap"],["gender-input","Update gender"],["export","Export"]];
+  const bar=document.getElementById("tabBar");
+  bar.innerHTML=tabs.map(([id,label])=>`<button class="tab-btn${id==="overview"?" active":""}" data-tab="${id}" onclick="showTab('${id}')">${label}</button>`).join("");
+}
+
+function renderOverview(){
+  const emp=EMPLOYEES.map(enrich);
+  const below=emp.filter(e=>e.status==="Below band");
+  const within=emp.filter(e=>e.status==="Within band");
+  const above=emp.filter(e=>e.status==="Above band");
+  const miss=emp.filter(e=>e.status==="Missing salary");
+  const totalGap=below.reduce((a,e)=>a+e.annualGap,0);
+  const avgSal=avg(emp.filter(e=>e.salary!==null).map(e=>e.salary));
+
+  let h=`<div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total employees</div><div class="stat-val">${emp.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Below band</div><div class="stat-val" style="color:#c5221f">${below.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Within band</div><div class="stat-val" style="color:#1a7f37">${within.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Above band</div><div class="stat-val" style="color:#92660a">${above.length}</div></div>
+    <div class="stat-card"><div class="stat-label">Missing salary</div><div class="stat-val" style="color:#888">${miss.length}</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+    <div class="card" style="background:#fce8e6;border-color:#f5b7b4">
+      <div style="font-size:12px;color:#888;margin-bottom:2px">Annual cost to bring all below-band to floor</div>
+      <div style="font-size:22px;font-weight:500;color:#c5221f">SEK ${totalGap.toLocaleString()}</div>
+    </div>
+    <div class="card" style="background:#f9f9f9">
+      <div style="font-size:12px;color:#888;margin-bottom:2px">Average monthly salary (employees with salary)</div>
+      <div style="font-size:22px;font-weight:500">SEK ${avgSal?.toLocaleString()??'—'}</div>
+    </div>
+  </div>`;
+
+  if(below.length){
+    h+=`<div class="card" style="background:#fce8e6;border-color:#f5b7b4;margin-bottom:14px">
+      <div class="card-title" style="color:#c5221f">⚠ ${below.length} people are below their salary band</div>`;
+    below.sort((a,b)=>b.gap-a.gap).forEach(e=>{
+      h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f5b7b4;font-size:12px">
+        <span><strong>${e.name}</strong> — ${e.role} ${e.level}</span>
+        <span style="color:#c5221f">SEK ${e.gap.toLocaleString()}/mo · SEK ${e.annualGap.toLocaleString()}/yr</span>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+  if(miss.length){
+    h+=`<div class="card" style="background:#f9f9f9"><div class="card-title">Salaries pending (${miss.length} people)</div>`;
+    miss.forEach(e=>{ h+=`<div style="font-size:12px;padding:3px 0;color:#666">${e.name} — ${e.role} ${e.level} (${e.team})</div>`; });
+    h+=`<div style="font-size:11px;color:#888;margin-top:6px">Management team and new hires. Add salaries once confirmed.</div></div>`;
+  }
+  document.getElementById("tab-overview").innerHTML=h;
+}
+
+function renderEmployees(){
+  const emp=EMPLOYEES.map(enrich);
+  const filtered=filterStatus==="all"?emp:emp.filter(e=>e.status===filterStatus);
+  const pills=["all","Below band","Within band","Above band","Missing salary"];
+  let h=`<div class="filter-bar">${pills.map(p=>`<button class="filter-pill${filterStatus===p?" active":""}" onclick="setFilter('${p}')">${p==="all"?"All":p}</button>`).join("")}</div>
+  <div style="overflow-x:auto"><table><thead><tr>
+    <th>Name</th><th>Role</th><th>Level</th><th>Team</th><th>Salary</th><th>Band min</th><th>Band max</th><th>Position</th><th>Status</th><th>Monthly gap</th>
+  </tr></thead><tbody>`;
+  filtered.forEach((e,i)=>{
+    h+=`<tr style="background:${i%2===0?"#fff":"#fafafa"}">
+      <td style="font-weight:500;white-space:nowrap">${e.name}</td>
+      <td style="white-space:nowrap">${e.role}</td>
+      <td>${e.level}</td>
+      <td style="color:#666">${e.team}</td>
+      <td>${e.salary!==null?e.salary.toLocaleString():'<span style="color:#aaa">—</span>'}</td>
+      <td style="color:#888">${e.band?e.band.min.toLocaleString():"—"}</td>
+      <td style="color:#888">${e.band?e.band.max.toLocaleString():"—"}</td>
+      <td>${barHTML(e.pos)}</td>
+      <td>${tagHTML(e.status)}</td>
+      <td style="color:${e.gap>0?"#c5221f":"#888"}">${e.gap>0?"+"+e.gap.toLocaleString():"—"}</td>
+    </tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  document.getElementById("tab-employees").innerHTML=h;
+}
+
+function renderPriority(){
+  const emp=EMPLOYEES.map(enrich);
+  const below=emp.filter(e=>e.status==="Below band").sort((a,b)=>b.gap-a.gap);
+  const above=emp.filter(e=>e.status==="Above band");
+  const totalAnnual=below.reduce((a,e)=>a+e.annualGap,0);
+  let h=`<div class="card" style="background:#f9f9f9;margin-bottom:14px">
+    <div class="card-body">Sorted by monthly gap. These are the people to prioritise in your next pay review cycle. <strong>Total annual correction cost: SEK ${totalAnnual.toLocaleString()}</strong></div>
+  </div>
+  <div style="overflow-x:auto"><table><thead><tr>
+    <th>#</th><th>Name</th><th>Role</th><th>Level</th><th>Current salary</th><th>Band min</th><th>Monthly gap</th><th>Annual gap</th><th>Action</th>
+  </tr></thead><tbody>`;
+  below.forEach((e,i)=>{
+    h+=`<tr><td style="font-weight:500;color:#c5221f">${i+1}</td><td style="font-weight:500">${e.name}</td><td>${e.role}</td><td>${e.level}</td>
+      <td>${e.salary?.toLocaleString()}</td><td style="color:#888">${e.band?.min.toLocaleString()}</td>
+      <td style="color:#c5221f;font-weight:500">+${e.gap.toLocaleString()}</td>
+      <td style="color:#c5221f">+${e.annualGap.toLocaleString()}</td>
+      <td>${tagHTML("Below band")}</td></tr>`;
+  });
+  above.forEach(e=>{
+    const over=e.salary-e.band.max;
+    h+=`<tr style="background:#fffdf5"><td style="color:#92660a">↑</td><td style="font-weight:500">${e.name}</td><td>${e.role}</td><td>${e.level}</td>
+      <td>${e.salary?.toLocaleString()}</td><td style="color:#888">${e.band?.max.toLocaleString()}</td>
+      <td style="color:#92660a">+${over.toLocaleString()} over</td>
+      <td style="color:#92660a">+${(over*12).toLocaleString()} over</td>
+      <td><span class="tag tag-amber">Freeze — grandfather</span></td></tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  document.getElementById("tab-priority").innerHTML=h;
+}
+
+function renderGender(){
+  const emp=EMPLOYEES.map(enrich);
+  const groups={};
+  emp.filter(e=>e.salary!==null).forEach(e=>{
+    const key=e.role+"|"+e.level;
+    if(!groups[key])groups[key]={role:e.role,level:e.level,m:[],f:[]};
+    const g=(genders[e.id]||"").toLowerCase();
+    if(["m","male","man"].includes(g))groups[key].m.push(e.salary);
+    else if(["f","female","woman","kvinna","k","w"].includes(g))groups[key].f.push(e.salary);
+  });
+  const rows=Object.values(groups).filter(g=>g.m.length>0&&g.f.length>0);
+  let h=`<div class="card" style="background:#f9f9f9;margin-bottom:14px">
+    <div class="card-body">Groups with fewer than 5 people are flagged — statistically unreliable and unlikely to require disclosure. Update gender data in the <strong>Update gender</strong> tab for accurate results.</div>
+  </div>`;
+  if(!rows.length){
+    h+=`<div class="card"><div class="card-body">No groups found with both male and female salary data. Add gender data in the Update gender tab first.</div></div>`;
+  } else {
+    h+=`<div style="overflow-x:auto"><table><thead><tr>
+      <th>Role</th><th>Level</th><th>Avg (men)</th><th>n</th><th>Avg (women)</th><th>n</th><th>Gap %</th><th>Group</th><th>Flag</th>
+    </tr></thead><tbody>`;
+    rows.forEach(g=>{
+      const mA=avg(g.m),fA=avg(g.f);
+      const gap=mA&&fA?Math.round(((mA-fA)/mA)*100):null;
+      const total=g.m.length+g.f.length;
+      const small=total<5;
+      let gapTag="—";
+      if(gap!==null){
+        const cl=Math.abs(gap)>=10?"tag-red":Math.abs(gap)>=5?"tag-amber":"tag-green";
+        gapTag=`<span class="tag ${cl}">${gap>0?"+":""}${gap}%</span>`;
+      }
+      let flag=small?`<span style="font-size:11px;color:#888">Too small</span>`:gap===null?"—":Math.abs(gap)>=10?`<span class="tag tag-red">Investigate</span>`:Math.abs(gap)>=5?`<span class="tag tag-amber">Monitor</span>`:`<span class="tag tag-green">OK</span>`;
+      h+=`<tr><td style="font-weight:500">${g.role}</td><td>${g.level}</td>
+        <td>${mA?.toLocaleString()??"—"}</td><td style="color:#888">${g.m.length}</td>
+        <td>${fA?.toLocaleString()??"—"}</td><td style="color:#888">${g.f.length}</td>
+        <td>${gapTag}</td>
+        <td style="color:${small?"#c5221f":"#666"}">${total}${small?" ⚠":""}</td>
+        <td>${flag}</td></tr>`;
+    });
+    h+=`</tbody></table></div>
+    <div class="card" style="background:#f9f9f9;margin-top:14px">
+      <div class="card-title">How to read this</div>
+      <div class="card-body">Positive % = men earn more. Negative % = women earn more.<br>
+      <strong>Under 5%</strong> — OK, monitor annually. <strong>5–10%</strong> — document the objective explanation. <strong>10%+</strong> — requires documented explanation or remediation plan within 90 days.</div>
+    </div>`;
+  }
+  document.getElementById("tab-gender").innerHTML=h;
+}
+
+function renderGenderInput(){
+  let h=`<div class="card" style="background:#f9f9f9;margin-bottom:14px">
+    <div class="card-body">Update gender data here. Changes take effect immediately across all tabs.</div>
+  </div>
+  <table><thead><tr><th>Name</th><th>Role</th><th>Level</th><th>Gender</th></tr></thead><tbody>`;
+  EMPLOYEES.forEach(e=>{
+    h+=`<tr><td style="font-weight:500">${e.name}</td><td>${e.role}</td><td>${e.level}</td>
+      <td><select onchange="updateGender('${e.id}',this.value)" style="background:${genders[e.id]?"#fff":"#fffdf0"}">
+        <option value="">— not set —</option>
+        <option value="m"${genders[e.id]==="m"?" selected":""}>Man</option>
+        <option value="f"${genders[e.id]==="f"?" selected":""}>Woman</option>
+        <option value="other"${genders[e.id]==="other"?" selected":""}>Other / prefer not to say</option>
+      </select></td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  document.getElementById("tab-gender-input").innerHTML=h;
+}
+
+function renderExport(){
+  let h=`<div class="card" style="background:#f9f9f9;margin-bottom:14px">
+    <div class="card-body">Download your audit data as CSV. Each export reflects current salary and gender data.</div>
+  </div>
+  <div class="export-grid">
+    <div class="card"><div class="card-title">Full employee audit</div>
+      <div class="card-body" style="margin-bottom:12px">All employees with band position, status, and monthly gap.</div>
+      <button class="dl" style="width:100%;background:#1a1a1a" onclick="exportCSV('full')">Download full audit CSV</button>
+    </div>
+    <div class="card"><div class="card-title">Priority list</div>
+      <div class="card-body" style="margin-bottom:12px">Below-band employees sorted by gap size, with totals.</div>
+      <button class="dl" style="width:100%;background:#c5221f" onclick="exportCSV('priority')">Download priority list CSV</button>
+    </div>
+    <div class="card"><div class="card-title">Gender gap analysis</div>
+      <div class="card-body" style="margin-bottom:12px">Average pay by gender per role and level. For compliance.</div>
+      <button class="dl" style="width:100%;background:#185FA5" onclick="exportCSV('gender')">Download gender gap CSV</button>
+    </div>
+  </div>
+  <div class="card" style="background:#f9f9f9">
+    <div class="card-title">How to use these exports</div>
+    <div class="card-body"><strong>Full audit</strong> — share with leadership. Redact Name column if preferred.<br>
+    <strong>Priority list</strong> — agenda for your pay review cycle. Total annual cost at the bottom.<br>
+    <strong>Gender gap</strong> — compliance evidence. Add a Justification / action column before archiving.</div>
+  </div>`;
+  document.getElementById("tab-export").innerHTML=h;
+}
+
+function updateGender(id,val){
+  genders[id]=val;
+  if(activeTab==="gender")renderGender();
+}
+
+function setFilter(f){
+  filterStatus=f;
+  renderEmployees();
+}
+
+function toCSV(rows){
+  if(!rows.length)return"";
+  const h=Object.keys(rows[0]);
+  return[h.join(","),...rows.map(r=>h.map(k=>{const v=r[k]??"";return String(v).includes(",")?`"${v}"`:v;}).join(","))].join("\n");
+}
+
+function dlCSV(content,filename){
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(content);
+  a.download=filename;a.click();
+}
+
+function exportCSV(type){
+  const emp=EMPLOYEES.map(enrich);
+  if(type==="full"){
+    dlCSV(toCSV(emp.map(e=>({
+      "Employee ID":e.id,"Name":e.name,"Team":e.team,"Role family":e.family,"Role":e.role,"Level":e.level,
+      "Employment %":e.pct,"Gender":e.gender,"Current salary (SEK)":e.salary??"",
+      "Band min":e.band?.min??""," Band mid":e.band?.mid??"","Band max":e.band?.max??"",
+      "Band position %":e.pos??"","Status":e.status,"Monthly gap":e.gap||"","Annual gap":e.annualGap||""
+    }))),"festina_pay_audit_full.csv");
+  }
+  if(type==="priority"){
+    const below=emp.filter(e=>e.status==="Below band").sort((a,b)=>b.gap-a.gap);
+    const rows=below.map((e,i)=>({
+      "Priority":i+1,"Employee ID":e.id,"Name":e.name,"Team":e.team,"Role":e.role,"Level":e.level,
+      "Current salary (SEK)":e.salary,"Band min (SEK)":e.band?.min,"Monthly gap (SEK)":e.gap,"Annual gap (SEK)":e.annualGap,"Action":"Correct in next pay review cycle"
+    }));
+    rows.push({"Priority":"TOTAL","Employee ID":"","Name":"","Team":"","Role":"","Level":"","Current salary (SEK)":"","Band min (SEK)":"",
+      "Monthly gap (SEK)":below.reduce((a,e)=>a+e.gap,0),"Annual gap (SEK)":below.reduce((a,e)=>a+e.annualGap,0),"Action":""});
+    dlCSV(toCSV(rows),"festina_pay_priority_list.csv");
+  }
+  if(type==="gender"){
+    const groups={};
+    emp.filter(e=>e.salary!==null).forEach(e=>{
+      const key=e.role+"|"+e.level;
+      if(!groups[key])groups[key]={role:e.role,level:e.level,m:[],f:[]};
+      const g=(e.gender||"").toLowerCase();
+      if(["m","male","man"].includes(g))groups[key].m.push(e.salary);
+      else if(["f","female","woman","kvinna","k","w"].includes(g))groups[key].f.push(e.salary);
+    });
+    dlCSV(toCSV(Object.values(groups).map(g=>{
+      const mA=avg(g.m),fA=avg(g.f);
+      const gap=mA&&fA?Math.round(((mA-fA)/mA)*100):null;
+      const total=g.m.length+g.f.length;
+      return{"Role":g.role,"Level":g.level,"Avg salary men (SEK)":mA??""," n (men)":g.m.length,
+        "Avg salary women (SEK)":fA??""," n (women)":g.f.length,"Total group":total,
+        "Gap %":gap!==null?gap+"%":"","Flag":total<5?"Too small":gap===null?"Insufficient data":Math.abs(gap)>=10?"Investigate":Math.abs(gap)>=5?"Monitor":"OK",
+        "Justification / action":""};
+    })),"festina_gender_pay_gap.csv");
+  }
+}
+
+function render(){
+  if(activeTab==="overview")renderOverview();
+  else if(activeTab==="employees")renderEmployees();
+  else if(activeTab==="priority")renderPriority();
+  else if(activeTab==="gender")renderGender();
+  else if(activeTab==="gender-input")renderGenderInput();
+  else if(activeTab==="export")renderExport();
+}
+
+buildTabs();
+render();
+</script>
+</body>
+</html>
