@@ -1,0 +1,351 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px}
+.wrap{padding:1rem 0}
+.tab-bar{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tab-btn{padding:7px 14px;font-size:13px;border:none;background:none;color:var(--color-text-secondary);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:var(--font-sans)}
+.tab-btn.active{color:var(--color-text-primary);font-weight:500;border-bottom-color:var(--color-text-primary)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+select,input,textarea{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px}
+select{cursor:pointer}
+input,textarea{width:100%}
+textarea{resize:vertical}
+button{font-family:var(--font-sans);cursor:pointer;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 12px;font-size:13px;color:var(--color-text-primary)}
+button:hover{background:var(--color-background-secondary)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem}
+.role-header{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap}
+.badge{font-size:11px;padding:3px 9px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.badge-warn{background:var(--color-background-warning);color:var(--color-text-warning);border-color:var(--color-border-warning)}
+.role-title{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.info-box{font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 12px;margin-bottom:1.25rem;line-height:1.6}
+.levels-grid{display:grid;gap:8px;margin-bottom:1.5rem}
+.level-card{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);overflow:hidden}
+.level-head{padding:10px 12px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.level-name{font-size:13px;font-weight:500}
+.level-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.level-body{padding:10px 12px}
+.comp-row{margin-bottom:10px}
+.comp-label{font-size:10px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.comp-text{font-size:12px;line-height:1.5;color:var(--color-text-primary)}
+.section-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px}
+.prog-grid{display:grid;gap:8px;margin-bottom:1.5rem}
+.prog-card{border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);padding:10px 12px}
+.prog-label{font-size:11px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.prog-list{list-style:none}
+.prog-list li{font-size:12px;line-height:1.5;padding-left:12px;position:relative;margin-bottom:3px;color:var(--color-text-primary)}
+.prog-list li::before{content:'·';position:absolute;left:2px;color:var(--color-text-secondary)}
+.lead-box{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-bottom:1.5rem}
+.lead-list{list-style:none;margin-top:6px}
+.lead-list li{font-size:12px;line-height:1.5;padding-left:14px;position:relative;margin-bottom:4px;color:var(--color-text-primary)}
+.lead-list li::before{content:'›';position:absolute;left:2px;color:var(--color-text-secondary)}
+.gtable{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:1.5rem}
+.gtable th{text-align:left;font-size:11px;font-weight:500;color:var(--color-text-secondary);padding:6px 8px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.gtable td{padding:7px 8px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);line-height:1.4;vertical-align:top}
+.gtable tr:last-child td{border-bottom:none}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.tag-blue{background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-border-info)}
+.tag-green{background:var(--color-background-success);color:var(--color-text-success);border:0.5px solid var(--color-border-success)}
+.tag-red{background:var(--color-background-danger);color:var(--color-text-danger);border:0.5px solid var(--color-border-danger)}
+.tag-warn{background:var(--color-background-warning);color:var(--color-text-warning);border:0.5px solid var(--color-border-warning)}
+.card{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);padding:14px 16px;margin-bottom:10px}
+.card-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px}
+.card-body{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+.rating-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.5rem}
+.rating-card{border-radius:var(--border-radius-md);padding:12px 14px;border:0.5px solid var(--color-border-tertiary)}
+.rating-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5;margin-top:6px}
+.cycle-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:1.5rem}
+.cycle-card{border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);padding:10px 12px;text-align:center}
+.cycle-num{font-size:20px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px}
+.cycle-name{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px}
+.cycle-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-field{display:flex;flex-direction:column;gap:4px}
+.goal-card{border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);padding:14px 16px;margin-bottom:10px}
+.goal-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.empty{text-align:center;padding:3rem;color:var(--color-text-secondary);font-size:14px}
+</style>
+
+<div class="wrap">
+
+<div class="tab-bar" id="tabBar"></div>
+
+<div id="tab-matrix" class="tab-pane active">
+  <div class="filters">
+    <select id="deptSel"></select>
+    <select id="roleSel"></select>
+  </div>
+  <div id="matrixOut"><div class="empty">Select a department and role above to view its career matrix</div></div>
+</div>
+
+<div id="tab-goals" class="tab-pane">
+  <div class="section-title" style="margin-bottom:14px">How we assess goals at Festina Group Tech</div>
+  <div class="card"><div class="card-title">The principle</div><div class="card-body">Goals are not a pass/fail checklist — they are evidence of how someone is growing. A goal that was attempted but didn't fully land, where the person can articulate why and what they learned, is more valuable than a goal that was gamed to show green. Assessors should look for consistent demonstrated behaviour, not one-off moments.</div></div>
+  <div class="section-title" style="margin-bottom:10px">Rating scale</div>
+  <div class="rating-grid">
+    <div class="rating-card"><span class="tag tag-red">1 — Not demonstrated</span><div class="rating-desc">The goal was not meaningfully attempted, or the behaviour is absent even when opportunities arose. No evidence of progress toward the linked competency.</div></div>
+    <div class="rating-card"><span class="tag tag-warn">2 — Developing</span><div class="rating-desc">Partial progress. The person is working toward the goal but not yet consistent. Shows awareness and intent but needs more reps or more depth.</div></div>
+    <div class="rating-card"><span class="tag tag-green">3 — Achieved</span><div class="rating-desc">The goal was met with clear evidence. The behaviour is consistent and visible to others. The linked competency has measurably improved.</div></div>
+    <div class="rating-card"><span class="tag tag-blue">4 — Exceeded</span><div class="rating-desc">The goal was met and the person went further — in scope, impact, or by lifting others. Evidence of performing at the next level.</div></div>
+  </div>
+  <div class="section-title" style="margin-bottom:10px">Assessment cycle</div>
+  <div class="cycle-grid">
+    <div class="cycle-card"><div class="cycle-num">1</div><div class="cycle-name">Goal-setting</div><div class="cycle-desc">Employee and manager align on 3–5 goals, each mapped to a competency and level transition</div></div>
+    <div class="cycle-card"><div class="cycle-num">2</div><div class="cycle-name">Mid-cycle check-in</div><div class="cycle-desc">Informal 1:1 review. Flag goals needing adjustment. No rating yet.</div></div>
+    <div class="cycle-card"><div class="cycle-num">3</div><div class="cycle-name">Self-assessment</div><div class="cycle-desc">Employee rates each goal 1–4 with evidence. Prompts reflection, not justification.</div></div>
+    <div class="cycle-card"><div class="cycle-num">4</div><div class="cycle-name">Manager review</div><div class="cycle-desc">Manager rates independently, then calibrates with employee. Gaps become the conversation.</div></div>
+  </div>
+  <div class="card"><div class="card-title">What counts as evidence?</div><div class="card-body">Evidence should be specific and observable — not "I communicated well" but "I wrote the team's onboarding doc and three people have referenced it." Good evidence includes: work artefacts others can point to, feedback from peers or stakeholders, decisions made and their outcomes, situations navigated and what happened as a result.</div></div>
+  <div class="card"><div class="card-title">Linking goal ratings to level progression</div><div class="card-body">No single goal rating triggers a promotion. Level progression requires a pattern across multiple cycles showing consistent performance at the next level. Someone consistently scoring 3–4 on goals tagged to their next transition, across two or more review cycles, is a strong candidate for progression.</div></div>
+  <div class="card" style="margin-bottom:1.5rem"><div class="card-title">The Lead designation and goals</div><div class="card-body">Taking a Lead role is itself a goal-worthy stretch assignment at any level. When someone takes on Lead responsibilities, their goals should reflect the planning and coordination behaviours — not just delivery. A Lead Junior or Lead Mid should have at least one goal explicitly tied to the planning scope they are owning.</div></div>
+  <div class="section-title" style="margin-bottom:10px">Example goal assessment</div>
+  <table class="gtable"><thead><tr><th>Goal</th><th>Competency</th><th>Transition</th><th>Self</th><th>Manager</th><th>Evidence</th></tr></thead><tbody>
+    <tr><td>Lead Q3 feature stream end-to-end</td><td><span class="tag tag-blue">Scope & ownership</span></td><td><span class="tag tag-green">Junior → Mid</span></td><td><span class="tag tag-green">3</span></td><td><span class="tag tag-green">3</span></td><td>Delivered on time, unblocked two team members, wrote the retro</td></tr>
+    <tr><td>Run a knowledge-sharing session</td><td><span class="tag tag-blue">Communication</span></td><td><span class="tag tag-green">Junior → Mid</span></td><td><span class="tag tag-blue">4</span></td><td><span class="tag tag-green">3</span></td><td>Session ran, recording shared, follow-up questions answered async</td></tr>
+    <tr><td>Improve test coverage on legacy module</td><td><span class="tag tag-blue">Quality & craft</span></td><td><span class="tag tag-green">Junior → Mid</span></td><td><span class="tag tag-warn">2</span></td><td><span class="tag tag-warn">2</span></td><td>Coverage up 12% but not to target; plan in place for next cycle</td></tr>
+  </tbody></table>
+</div>
+
+<div id="tab-template" class="tab-pane">
+  <div class="section-title" style="margin-bottom:6px">Goal-setting template</div>
+  <p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:1.25rem;line-height:1.5">Complete this together in your first 1:1 of the cycle. Aim for 3–5 goals. Each goal must link to a competency and a level transition so it's clear why it matters for progression.</p>
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-title" style="margin-bottom:10px">Employee details</div>
+    <div class="form-grid">
+      <div class="form-field"><span class="comp-label">Name</span><input type="text" id="tName" placeholder="Full name"></div>
+      <div class="form-field"><span class="comp-label">Role</span><input type="text" id="tRole" placeholder="e.g. Backend Developer"></div>
+      <div class="form-field"><span class="comp-label">Current level</span>
+        <select id="tLevel"><option value="">Select</option><option>Graduate</option><option>Junior</option><option>Mid</option><option>Senior</option></select>
+      </div>
+      <div class="form-field"><span class="comp-label">Manager</span><input type="text" id="tManager" placeholder="Manager name"></div>
+      <div class="form-field"><span class="comp-label">Cycle start</span><input type="date" id="tStart"></div>
+      <div class="form-field"><span class="comp-label">Review date</span><input type="date" id="tEnd"></div>
+    </div>
+  </div>
+  <div id="goalsList"></div>
+  <button id="addGoalBtn" style="margin-bottom:1.5rem">+ Add goal</button>
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-title" style="margin-bottom:8px">Lead designation</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <input type="checkbox" id="tLead" style="width:16px;height:16px;cursor:pointer;flex-shrink:0">
+      <label for="tLead" style="font-size:13px;color:var(--color-text-primary);cursor:pointer">This employee holds a Lead designation this cycle</label>
+    </div>
+    <div class="form-field"><span class="comp-label">Lead stream / area of responsibility</span><input type="text" id="tLeadStream" placeholder="e.g. Q3 checkout redesign"></div>
+  </div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-title" style="margin-bottom:8px">Manager notes</div>
+    <div class="form-field"><span class="comp-label">Context, focus areas, or development priorities</span><textarea id="tNotes" placeholder="Optional — any context that sets this cycle up well..." style="min-height:80px"></textarea></div>
+  </div>
+  <button onclick="window.print()">Print / save as PDF</button>
+</div>
+
+</div>
+
+<script>
+const TABS = [['matrix','Career matrix'],['goals','Goal assessment'],['template','Goal-setting template']];
+const DEPTS = {
+  'Software Engineering':{ roles:['Cloud Developer','Backend Developer','Frontend Developer','Fullstack Developer','Mobile Developer','Web Development Manager','Engineering Manager'], mgr:['Web Development Manager','Engineering Manager'] },
+  'Data & AI':{ roles:['Data Scientist'], mgr:[] },
+  'Quality Assurance':{ roles:['QA Engineer'], mgr:[] },
+  'Design & UX':{ roles:['UX Designer','Web Designer','Design Manager'], mgr:['Design Manager'] },
+  'Embedded Engineering':{ roles:['Embedded Engineer'], mgr:[] },
+  'Hardware / Electronics':{ roles:['Electronics Engineer','Mechanical Engineer'], mgr:[] },
+  'Product & Agile':{ roles:['Product Owner','Agile Coach','Head of Product','Product Manager'], mgr:['Head of Product'] },
+  'Customer Support':{ roles:['Customer Support Specialist'], mgr:[] },
+  'Marketing & Growth':{ roles:['SEM Specialist','Performance Marketing Specialist','Organic Growth Specialist','Content Strategist','Web Editor','Marketing Manager'], mgr:['Marketing Manager'] },
+  'People & HR':{ roles:['People & Operations','People & Culture Manager','Head of HR'], mgr:['People & Culture Manager','Head of HR'] }
+};
+const SENIOR_ONLY = new Set(['Head of HR','Head of Product']);
+const MGR_SET = new Set(Object.values(DEPTS).flatMap(d=>d.mgr));
+const COMPS = ['Scope & ownership','Technical / domain skill','Quality & craft','Collaboration','Communication','Problem-solving','Leadership & influence'];
+const COMP_LIST = ['Scope & ownership','Technical / domain skill','Quality & craft','Collaboration','Communication','Problem-solving','Leadership & influence'];
+const TRANS_LIST = ['Graduate → Junior','Junior → Mid','Mid → Senior','Leadership track'];
+const LVL_LABELS = {Graduate:'Entry level',Junior:'Developing independently',Mid:'Fully independent',Senior:'Multiplier & strategic'};
+const LVL_COMP = {
+  Graduate:{'Scope & ownership':'Works on well-defined sub-tasks with close supervision. Asks before acting.','Quality & craft':'Produces work that requires review and correction cycles. Learning quality standards.','Collaboration':'Participates in team rituals; asks questions and listens actively.','Communication':'Shares updates clearly when prompted; learning to document work.','Problem-solving':'Solves straightforward problems with guidance; escalates blockers promptly.','Leadership & influence':'Focused on personal learning; no expectation of influence yet.'},
+  Junior:{'Scope & ownership':'Owns small, scoped tasks end-to-end with moderate guidance. Delivers reliably.','Quality & craft':'Produces work that meets standards with light review. Responds well to feedback.','Collaboration':'Contributes constructively in team discussions. Helps onboard graduates.','Communication':'Writes clear tickets, PRs/briefs. Raises blockers proactively.','Problem-solving':'Resolves known problem patterns independently. Seeks help for novel issues.','Leadership & influence':"Can take a 'lead' designation — coordinating planning for a small stream."},
+  Mid:{'Scope & ownership':'Owns features or workstreams autonomously. Defines approach, not just executes it.','Quality & craft':'Consistently high-quality output. Proactively spots issues before review.','Collaboration':'Mentors juniors and graduates informally. Improves team processes.','Communication':'Facilitates discussions. Writes documentation others rely on.','Problem-solving':'Handles ambiguous problems; proposes multiple solutions and evaluates trade-offs.','Leadership & influence':"Regularly takes 'lead' on cross-team deliverables. Influences key decisions."},
+  Senior:{'Scope & ownership':'Drives entire product areas or domains. Sets direction, not just delivers.','Quality & craft':'Defines quality standards for the team. Prevents systemic issues.','Collaboration':'Builds team capability; coaches mid-level colleagues. Connects work to business goals.','Communication':'Influences stakeholders. Translates complexity for non-technical audiences.','Problem-solving':'Anticipates and prevents problems. Defines frameworks others use.','Leadership & influence':'Natural go-to leader. Shapes how the team works; may manage without formal title.'}
+};
+const ROLE_TECH = {
+  'Cloud Developer':['Cloud platforms (AWS/Azure/GCP), IaC (Terraform/CDK), CI/CD, containerisation (Docker/K8s)','Building familiarity with core cloud services and basic IaC','Designs scalable cloud architectures; owns cost and security trade-offs','Sets cloud strategy; defines platform standards across engineering'],
+  'Backend Developer':['Server-side languages (Node/Python/Go/Java), REST/GraphQL APIs, databases, system design','CRUD APIs in one language; basic SQL; understands HTTP fundamentals','Designs service boundaries, async patterns, caching strategies','Architects for scale and resilience; defines backend standards'],
+  'Frontend Developer':['HTML/CSS/JS, a primary framework (React/Vue/Angular), accessibility, performance, design systems','Component building in a framework; basic state management; responsive layouts','Leads complex UI architecture; mentors on accessibility and performance','Defines frontend standards; drives design system adoption'],
+  'Fullstack Developer':['Full-stack proficiency across frontend and backend; API design, databases, deployment','End-to-end feature delivery with guidance on architecture','Independently designs and ships full-stack features; spots cross-layer issues','Owns full-stack architecture decisions; bridges frontend and backend teams'],
+  'Mobile Developer':['Native or cross-platform mobile (iOS/Android/React Native/Flutter), app store lifecycle','Feature delivery on a single platform with guidance','Confident across platforms; handles performance, offline, and lifecycle edge cases','Defines mobile architecture; drives cross-platform strategy'],
+  'Data Scientist':['Statistics, ML frameworks (scikit-learn/PyTorch/TF), SQL, data pipelines, experiment design','Runs guided analyses and builds basic models; familiar with pandas/SQL','Designs experiments, builds production-grade models, communicates findings clearly','Sets data/ML strategy; defines modelling standards and experiment frameworks'],
+  'QA Engineer':['Test strategy, manual and automated testing, bug lifecycle, CI integration (Selenium/Playwright/Cypress)','Writes test cases; executes regression cycles; logs bugs clearly','Designs test frameworks; integrates automation into CI; champions quality culture','Defines QA strategy; drives shift-left testing across engineering'],
+  'UX Designer':['User research, wireframing, prototyping, usability testing, design systems (Figma)','Executes wireframes and flows under guidance; participates in user research','Leads end-to-end design for a product area; facilitates usability testing independently','Shapes design strategy; owns design system; elevates craft standards'],
+  'Web Designer':['Visual design, HTML/CSS, CMS tools, brand systems, accessibility basics','Produces on-brand assets and page layouts under guidance','Leads visual identity for campaigns; owns CMS and brand consistency','Sets visual direction; bridges brand and product design'],
+  'Embedded Engineer':['C/C++, RTOS, hardware interfaces (UART/SPI/I2C), debugging tools (JTAG/oscilloscope), firmware lifecycle','Writes firmware for defined modules under guidance; familiar with one RTOS','Designs firmware architecture; owns bring-up and integration for new hardware','Sets embedded standards; drives system-level design decisions'],
+  'Electronics Engineer':['Schematic capture, PCB layout, signal integrity, component selection, design for manufacture','Assists with schematics and layout under guidance; basic bench skills','Owns full PCB design cycles; designs for EMC and DFM','Sets hardware architecture; drives platform and component strategy'],
+  'Mechanical Engineer':['CAD (SolidWorks/Fusion), FEA, GD&T, manufacturing processes, tolerance analysis','Creates parts and assemblies under guidance; supports prototype builds','Owns mechanical design for a product; leads DFM reviews','Sets mechanical architecture; owns design standards and toolchain'],
+  'Product Owner':['Backlog management, user story writing, sprint ceremonies, stakeholder alignment, acceptance criteria','Writes well-formed user stories; maintains a groomed backlog with guidance','Owns product backlog independently; balances business and technical trade-offs','Defines product vision and roadmap; aligns multiple stakeholder groups'],
+  'Product Manager':['Product strategy, roadmapping, market analysis, OKRs, cross-functional delivery, stakeholder management','Supports roadmap delivery; writes briefs and specs with guidance','Owns a product area end-to-end; drives prioritisation and cross-team alignment','Sets product strategy; influences company direction; leads product organisation'],
+  'Agile Coach':['Agile/Scrum/Kanban frameworks, facilitation, team health diagnostics, retrospective tooling','Facilitates ceremonies under guidance; supports one or two teams','Coaches teams independently; introduces process improvements; resolves team friction','Drives organisational agile transformation; shapes ways of working at scale'],
+  'Customer Support Specialist':['CRM/ticketing tools (Zendesk/Intercom), written communication, product knowledge, escalation paths','Handles tier-1 tickets with guidance; follows documented escalation paths','Handles complex cases independently; improves knowledge base; mentors new hires','Defines support strategy; shapes product feedback loops; drives CSAT improvements'],
+  'SEM Specialist':['Google Ads / Microsoft Ads, keyword strategy, bid management, Quality Score, conversion tracking','Manages campaigns under guidance; pulls standard reports','Owns campaign strategy and budget; conducts A/B testing; analyses full-funnel impact','Sets paid search strategy; owns forecasting models and channel investment decisions'],
+  'Performance Marketing Specialist':['Paid social and display (Meta/TikTok/DV360), attribution modelling, audience building, creative testing','Runs campaigns under guidance; interprets basic attribution data','Owns multi-channel paid strategy; leads creative testing programmes','Sets performance marketing strategy; defines attribution frameworks'],
+  'Organic Growth Specialist':['SEO (on-page/technical/off-page), content strategy, analytics (GA4/Search Console), CRO basics','Implements on-page optimisations under guidance; monitors keyword rankings','Owns technical and content SEO strategy; drives measurable organic growth','Sets organic growth strategy; aligns SEO with broader product and content goals'],
+  'Content Strategist':['Content strategy, editorial planning, SEO content, brand voice, CMS management','Produces content to brief; follows editorial calendar','Owns content strategy for a channel or audience; develops brand voice guidelines','Sets content strategy at brand level; aligns content with growth and product goals'],
+  'Web Editor':['CMS (WordPress/Contentful/etc.), HTML basics, brand/style guidelines, SEO fundamentals','Publishes and edits content under guidance; follows style guide','Owns content publishing workflow; ensures quality and consistency across site','Defines content governance; manages editorial standards and CMS architecture'],
+  'People & Operations':['HR admin, onboarding/offboarding, HRIS, employment law basics, employee experience','Supports HR processes under guidance; handles administrative tasks accurately','Owns core HR operations independently; improves processes and employee experience','Defines people operations strategy; drives compliance, systems and efficiency at scale'],
+  'People & Culture Manager':['People strategy, talent management, culture programmes, DEI initiatives, HR business partnering','Supports people programmes under guidance; builds relationships with managers','Owns people partnering for a business unit; drives engagement and talent processes','Sets people and culture strategy; shapes how the company attracts, grows and retains talent'],
+  'Head of HR':['HR strategy, employment law, org design, total rewards, M&A people integration, board-level reporting','—','—','Owns all HR strategy and operations; accountable for people function at executive level'],
+  'Head of Product':['Product strategy, portfolio management, market intelligence, OKR frameworks, exec communication','—','—','Owns product strategy and organisation; shapes company direction; leads product managers'],
+  'Web Development Manager':['Technical leadership, web technologies, project planning, stakeholder management, team development','Manages a small team with guidance; tracks delivery and reports upward','Leads delivery for a web development function; hires and develops team members','Owns web engineering strategy; sets technical direction; aligns with business goals'],
+  'Engineering Manager':['Engineering leadership, system design understanding, delivery management, hiring, performance management','Manages a small team; runs ceremonies; removes blockers','Leads a full engineering team; sets technical culture; drives delivery and team growth','Sets engineering strategy; builds org capability; works at director level on planning'],
+  'Design Manager':['Design leadership, design process, stakeholder management, team development, design systems oversight','Manages a small design team with guidance; ensures quality of output','Leads design function for a product area; builds team capability and process','Sets design vision; drives design maturity across the organisation'],
+  'Marketing Manager':['Marketing strategy, campaign planning, budget management, cross-channel execution, team leadership','Coordinates campaigns under guidance; supports team planning','Leads a marketing function or channel; owns budget and results','Sets marketing strategy; aligns brand, growth and content at company level']
+};
+const PROG = {
+  'Graduate → Junior':['Consistently delivers assigned tasks without needing re-scoping','Requires minimal supervision on familiar work types','Demonstrates understanding of the team quality bar','Takes ownership when something goes wrong rather than deflecting'],
+  'Junior → Mid':['Owns a feature or stream end-to-end with no hand-holding','Proactively identifies problems before they are flagged by others','Actively helps junior/graduate colleagues grow','Shapes how a piece of work is approached, not just executed'],
+  'Mid → Senior':['Consistently operates at a level above their current title','Raises the quality bar for others around them','Leads cross-functional work comfortably','Work has lasting, visible impact beyond their immediate team']
+};
+const EXAMPLE_GOALS = [
+  {g:'Lead a project stream from planning to delivery',c:'Scope & ownership',t:'Junior → Mid'},
+  {g:'Conduct a knowledge-sharing session for the team',c:'Communication',t:'Junior → Mid'},
+  {g:'Identify and fix a systemic quality issue proactively',c:'Quality & craft',t:'Mid → Senior'},
+  {g:'Mentor a junior or graduate through a complete deliverable',c:'Leadership & influence',t:'Mid → Senior'},
+  {g:'Define or improve a team process or workflow',c:'Collaboration',t:'Junior → Mid'},
+  {g:'Complete a relevant certification or structured learning',c:'Technical / domain skill',t:'Graduate → Junior'},
+  {g:'Resolve an ambiguous problem with documented reasoning',c:'Problem-solving',t:'Junior → Mid'},
+  {g:'Present a proposal to senior stakeholders and get it actioned',c:'Communication',t:'Mid → Senior'}
+];
+
+let goalCount = 0;
+
+function getDept(role){ for(const [d,v] of Object.entries(DEPTS)) if(v.roles.includes(role)) return d; return ''; }
+
+function buildTabs(){
+  const bar = document.getElementById('tabBar');
+  TABS.forEach(([id,label],i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (i===0?' active':'');
+    btn.textContent = label;
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById('tab-'+id).classList.add('active');
+      this.classList.add('active');
+    });
+    bar.appendChild(btn);
+  });
+}
+
+function buildDeptSelect(){
+  const sel = document.getElementById('deptSel');
+  sel.innerHTML = '';
+  const all = document.createElement('option'); all.value=''; all.textContent='All role families'; sel.appendChild(all);
+  Object.keys(DEPTS).forEach(d=>{ const o=document.createElement('option');o.value=d;o.textContent=d;sel.appendChild(o); });
+  sel.addEventListener('change', updateRoleSelect);
+}
+
+function updateRoleSelect(){
+  const dept = document.getElementById('deptSel').value;
+  const sel = document.getElementById('roleSel');
+  sel.innerHTML = '';
+  const def = document.createElement('option'); def.value=''; def.textContent='Select a role'; sel.appendChild(def);
+  const roles = dept ? DEPTS[dept].roles : Object.values(DEPTS).flatMap(d=>d.roles);
+  roles.forEach(r=>{ const o=document.createElement('option');o.value=r;o.textContent=r;sel.appendChild(o); });
+  document.getElementById('matrixOut').innerHTML = '<div class="empty">Select a role to view its career matrix</div>';
+  sel.addEventListener('change', renderMatrix);
+}
+
+function renderMatrix(){
+  const role = document.getElementById('roleSel').value;
+  if(!role){ document.getElementById('matrixOut').innerHTML='<div class="empty">Select a role to view its career matrix</div>'; return; }
+  const dept = getDept(role);
+  const isMgr = MGR_SET.has(role);
+  const isSrOnly = SENIOR_ONLY.has(role);
+  const levels = isSrOnly ? ['Senior'] : isMgr ? ['Junior','Mid','Senior'] : ['Graduate','Junior','Mid','Senior'];
+  const tech = ROLE_TECH[role] || ['Role-specific domain skills','Foundation','Advanced','Expert'];
+  const techByLevel = {Graduate:tech[1],Junior:tech[1],Mid:tech[2],Senior:tech[3]};
+
+  let h = '';
+  h += `<div class="role-header"><span class="badge">${dept}</span><span class="role-title">${role}</span>${isMgr?'<span class="badge badge-warn">Leadership track</span>':''}</div>`;
+  h += `<div class="info-box"><strong>About the Lead designation:</strong> "Lead" is not a separate level — it's a planning responsibility assignable at any level. A Lead ${role.toLowerCase()} owns planning and coordination for a stream while staying within their current salary bracket.</div>`;
+
+  h += `<div class="levels-grid" style="grid-template-columns:repeat(${levels.length},minmax(0,1fr))">`;
+  levels.forEach(lvl=>{
+    const lc = LVL_COMP[lvl]||LVL_COMP.Senior;
+    h += `<div class="level-card"><div class="level-head"><div class="level-name">${lvl}</div><div class="level-sub">${LVL_LABELS[lvl]||''}</div></div><div class="level-body">`;
+    COMPS.forEach(c=>{
+      const txt = c==='Technical / domain skill' ? (techByLevel[lvl]||tech[3]) : (lc[c]||'');
+      h += `<div class="comp-row"><div class="comp-label">${c}</div><div class="comp-text">${txt}</div></div>`;
+    });
+    h += `</div></div>`;
+  });
+  h += `</div>`;
+
+  if(!isSrOnly){
+    const trs = isMgr
+      ? [['Junior → Mid',PROG['Junior → Mid']],['Mid → Senior',PROG['Mid → Senior']]]
+      : [['Graduate → Junior',PROG['Graduate → Junior']],['Junior → Mid',PROG['Junior → Mid']],['Mid → Senior',PROG['Mid → Senior']]];
+    h += `<div class="section-title">How to progress to the next level</div>`;
+    h += `<div class="prog-grid" style="grid-template-columns:repeat(${trs.length},minmax(0,1fr))">`;
+    trs.forEach(([lbl,items])=>{
+      h += `<div class="prog-card"><div class="prog-label">${lbl}</div><ul class="prog-list">`;
+      items.forEach(i=>{ h+=`<li>${i}</li>`; });
+      h += `</ul></div>`;
+    });
+    h += `</div>`;
+  }
+
+  h += `<div class="lead-box"><div class="card-title">What does a Lead ${role} do differently?</div><ul class="lead-list"><li>Owns the planning cycle for their stream — sprint/project planning, backlog grooming, or equivalent</li><li>First point of contact for stakeholders on that stream's status and blockers</li><li>Coordinates dependencies between team members; not a line manager</li><li>Still an individual contributor — does not manage performance or HR matters</li></ul></div>`;
+
+  h += `<div class="section-title">Example goals and how they tie to progression</div>`;
+  h += `<table class="gtable"><thead><tr><th>Example goal</th><th>Competency</th><th>Supports transition</th></tr></thead><tbody>`;
+  EXAMPLE_GOALS.forEach(g=>{
+    if(isMgr && g.t==='Graduate → Junior') return;
+    h += `<tr><td>${g.g}</td><td><span class="tag tag-blue">${g.c}</span></td><td><span class="tag tag-green">${g.t}</span></td></tr>`;
+  });
+  h += `</tbody></table>`;
+
+  document.getElementById('matrixOut').innerHTML = h;
+}
+
+function addGoal(){
+  goalCount++;
+  const n = goalCount;
+  const div = document.createElement('div');
+  div.className = 'goal-card';
+  div.id = 'goal-'+n;
+  div.innerHTML = `
+    <div class="goal-card-head">
+      <div class="card-title">Goal ${n}</div>
+      <button data-id="${n}" class="remove-goal-btn">Remove</button>
+    </div>
+    <div style="display:grid;gap:8px">
+      <div class="form-field"><span class="comp-label">Goal description</span><input type="text" placeholder="What will this person do or achieve?"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="form-field"><span class="comp-label">Competency</span>
+          <select><option value="">Select</option>${COMP_LIST.map(c=>`<option>${c}</option>`).join('')}</select>
+        </div>
+        <div class="form-field"><span class="comp-label">Supports transition</span>
+          <select><option value="">Select</option>${TRANS_LIST.map(t=>`<option>${t}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="form-field"><span class="comp-label">What does success look like?</span><input type="text" placeholder="Specific, observable outcome or artefact"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="form-field"><span class="comp-label">Self-rating (end of cycle)</span>
+          <select><option value="">— fill at review —</option><option>1 — Not demonstrated</option><option>2 — Developing</option><option>3 — Achieved</option><option>4 — Exceeded</option></select>
+        </div>
+        <div class="form-field"><span class="comp-label">Manager rating (end of cycle)</span>
+          <select><option value="">— fill at review —</option><option>1 — Not demonstrated</option><option>2 — Developing</option><option>3 — Achieved</option><option>4 — Exceeded</option></select>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('goalsList').appendChild(div);
+  div.querySelector('.remove-goal-btn').addEventListener('click', function(){
+    document.getElementById('goal-'+this.dataset.id).remove();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  buildTabs();
+  buildDeptSelect();
+  updateRoleSelect();
+  document.getElementById('addGoalBtn').addEventListener('click', addGoal);
+});
+</script>
